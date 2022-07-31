@@ -1,0 +1,8 @@
+me\loudbook\discordlink\minecraft\Minecraft$MessageType.class
+me\loudbook\discordlink\minecraft\Minecraft.class
+me\loudbook\discordlink\minecraft\MinecraftListener.class
+me\loudbook\discordlink\discord\Discord.class
+me\loudbook\discordlink\discord\DiscordListener.class
+me\loudbook\discordlink\backend\Constants.class
+me\loudbook\discordlink\backend\Config.class
+me\loudbook\discordlink\Main.class
