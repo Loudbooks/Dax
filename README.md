@@ -9,7 +9,7 @@ The only Hypixel Guild ⇄ Discord bridge you will ever need!
 - Very customizable
 - Works on any operating system
 - Supports [webhook](https://imgur.com/a/ArPXuRj) and [embeds](https://imgur.com/a/tYgDdPY) for Discord formatting
-- Automatic rejoin if the bot happens to reconnect
+- Automatic rejoin if the bot happens to disconnect
 
 
 
