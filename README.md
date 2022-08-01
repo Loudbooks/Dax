@@ -8,6 +8,9 @@ The only Hypixel Guild ⇄ Discord bridge you will ever need!
 - Reacts with X if Hypixel responds with "You cannot say the same message twice!" or "You can only send a message every 3 seconds!"
 - Very customizable
 - Works on any operating system
+- Supports [webhook](https://imgur.com/a/ArPXuRj) and [embeds](https://imgur.com/a/tYgDdPY) for Discord formatting
+
+
 
 ## Install
 
