@@ -38,7 +38,7 @@ public class Main {
             e.printStackTrace();
             System.out.println("[ERROR] Failed to connect to Minecraft! Is your username, password, and Microsoft token correct?");
         }
-        Scanner input = new Scanner(System.in);
+/*        Scanner input = new Scanner(System.in);
         String command = input.nextLine();
         if (command.startsWith("execute")){
             String commandFormatted = command.toLowerCase().replace("execute", "").trim();
@@ -60,7 +60,6 @@ public class Main {
             System.out.println("[Dax] Left guild");
         } else {
             System.out.println("[ERROR] Unknown command!");
-        }
-
+        }*/
     }
 }

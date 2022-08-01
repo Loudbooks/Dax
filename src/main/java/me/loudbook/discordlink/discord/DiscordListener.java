@@ -31,7 +31,6 @@ public class DiscordListener extends ListenerAdapter {
                     client.send(new ServerboundChatPacket("/gc " + author + ": " + message));
                     discord.getMessageIds().add(e.getMessage().getId());
                 } else if (e.getTextChannel().getId().equals(discord.getOfficerChannel().getId())){
-                    System.out.println("/go " + author + ": " + message);
                     client.send(new ServerboundChatPacket("/go " + author + ": " + message));
                     discord.getMessageIds().add(e.getMessage().getId());
                 }
