@@ -1,5 +1,5 @@
 # Dax
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/Loudbooks/Dax?style=flat-square) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Loudbooks/Dax/build-status?style=flat-square)<br/>
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/Loudbooks/Dax?style=flat-square) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Loudbooks/Dax/Java CI with Maven?style=flat-square)<br/>
 The only Hypixel Guild <-> Discord bridge you will ever need!
 
 ## Features
