@@ -42,8 +42,8 @@ public class Config {
             System.out.println("[ERROR] password is not set in config.properties");
             System.exit(1);
         }
-        if (this.properties.getProperty("msa_token") == null) {
-            System.out.println("[ERROR] msa_token is not set in config.properties");
+        if (this.properties.getProperty("msa-token") == null) {
+            System.out.println("[ERROR] msa-token is not set in config.properties");
             System.exit(1);
         }
         if (this.properties.getProperty("main-channel-id") == null) {

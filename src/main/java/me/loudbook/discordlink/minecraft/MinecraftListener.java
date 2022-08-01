@@ -36,7 +36,7 @@ public class MinecraftListener extends SessionAdapter {
             String gson = GsonComponentSerializer.gson().serialize(message);
             JsonObject jsonObject = (JsonObject) new JsonParser().parse(gson);
             ArrayList<String> messagesID = discord.getMessageIds();
-            if (jsonObject.get("text").getAsString().equals("You cannot say the same message twice!")) {
+            if (jsonObject.get("text").getAsString().equals("You cannot say the same message twice!") || jsonObject.get("text").getAsString().contains("You can only chat every")) {
                 try {
                     textChannel.retrieveMessageById(messagesID.get(0)).queue((messageFail) -> messageFail.addReaction("❌").queue());
                     messagesID.remove(0);

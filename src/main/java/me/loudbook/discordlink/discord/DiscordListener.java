@@ -18,13 +18,14 @@ public class DiscordListener extends ListenerAdapter {
             String message = e.getMessage().getContentDisplay();
             Member member = discord.getGuild().getMember(e.getAuthor());
             String author;
-            if (member != null) {
+            if (member != null && member.getNickname() != null) {
                 author = member.getNickname();
             } else {
                 author = e.getAuthor().getName();
             }
             Minecraft minecraft = Constants.getInstance().getMinecraft();
             Session client = minecraft.getClient();
+            if (client == null) return;
             if (!(message.chars().count() > 255)) {
                 if (e.getTextChannel().getId().equals(discord.getMainChannel().getId())) {
                     client.send(new ServerboundChatPacket("/gc " + author + ": " + message));

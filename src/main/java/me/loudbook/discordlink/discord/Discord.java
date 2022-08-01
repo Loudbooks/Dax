@@ -1,5 +1,8 @@
 package me.loudbook.discordlink.discord;
 
+import club.minnced.discord.webhook.WebhookClient;
+import club.minnced.discord.webhook.WebhookClientBuilder;
+import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import lombok.Getter;
 import me.loudbook.discordlink.backend.Config;
 import me.loudbook.discordlink.backend.Constants;
@@ -19,15 +22,21 @@ import javax.security.auth.login.LoginException;
 import java.awt.*;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class Discord {
     @Getter
     private JDA jda;
     @Getter
     private final ArrayList<String> messageIds;
+    @Getter
+    private WebhookClient webhookClient;
 
     private Config config;
     public Discord(){
@@ -75,6 +84,18 @@ public class Discord {
         getMainChannel().sendMessageEmbeds(eb.build()).queue();
     }
 
+    public void createWebhookClient(String url){
+        WebhookClientBuilder builder = new WebhookClientBuilder(url); // or id, token
+        builder.setThreadFactory((job) -> {
+            Thread thread = new Thread(job);
+            thread.setName("main");
+            thread.setDaemon(true);
+            return thread;
+        });
+        builder.setWait(true);
+        this.webhookClient = builder.build();
+    }
+
     public TextChannel getMainChannel(){
         return this.jda.getTextChannelById(config.getProperties().getProperty("main-channel-id"));
     }
@@ -88,23 +109,12 @@ public class Discord {
     }
 
     public void sendWebhook(String message, String author, String avatar, String webhookUrl) throws IOException {
-        JSONObject json = new JSONObject();
-        json.put("content", message);
-        json.put("username", author);
-        json.put("avatar_url", avatar);
-        json.put("tts", false);
-        URL url = new URL(webhookUrl);
-        HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-        connection.addRequestProperty("Content-Type", "application/json");
-        connection.addRequestProperty("User-Agent", "Hypixel Guild Discord bridge by Loudbook");
-        connection.setDoOutput(true);
-        connection.setRequestMethod("POST");
-        OutputStream stream = connection.getOutputStream();
-        stream.write(json.toString().getBytes(StandardCharsets.UTF_8));
-        stream.flush();
-        stream.close();
-        connection.getInputStream().close();
-        connection.disconnect();
+        Discord discord = Constants.getInstance().getDiscord();
+        WebhookMessageBuilder builder = new WebhookMessageBuilder();
+        builder.setUsername(author);
+        builder.setAvatarUrl(avatar);
+        builder.setContent(message);
+        discord.getWebhookClient().send(builder.build());
     }
 
     public void sendEmbed(String message, String author, String avatar){

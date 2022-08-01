@@ -26,9 +26,12 @@ public class Main {
         Properties prop = Constants.getInstance().getConfig().getProperties();
         Constants.getInstance().getDiscord().connect(prop.getProperty("discord-token"));
 
+        if (Boolean.parseBoolean(prop.get("use-webhook").toString())){
+            discord.createWebhookClient(prop.getProperty("webhook-url"));
+        }
         String username = prop.getProperty("username");
         String password = prop.getProperty("password");
-        String msa_token = prop.getProperty("msa_token");
+        String msa_token = prop.getProperty("msa-token");
         try {
             Constants.getInstance().getMinecraft().connect(username, password, msa_token);
         } catch (RequestException e) {
