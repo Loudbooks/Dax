@@ -10,7 +10,9 @@ The only Hypixel Guild ⇄ Discord bridge you will ever need!
 - Works on any operating system.
 - Supports [webhook](https://imgur.com/a/ArPXuRj) and [embeds](https://imgur.com/a/tYgDdPY) for Discord formatting.
 - Automatic rejoin if the bot happens to disconnect.
-- Does not run an instance of Minecraft. Only uses Minecraft credentials to create a "fake" client. Uses up merely no resources.
+- Does not run an instance of Minecraft. Only uses Minecraft credentials to create a "fake" client. 
+- Uses up merely no resources.
+- No history of bans while using this code.
 
 
 
