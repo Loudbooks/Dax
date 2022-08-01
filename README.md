@@ -1,13 +1,13 @@
 # Dax
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Loudbooks/Dax/Java%20CI%20with%20Maven?style=flat-square) ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/Loudbooks/Dax?include_prereleases&style=flat-square)<br/>
-The only Hypixel Guild <-> Discord bridge you will ever need!
+The only Hypixel Guild ⇄ Discord bridge you will ever need!
 
 ## Features
-- [Easy-*ish* setup](#installi)
-- [Instant messages back and fourth](#respond)
-- [Reacts with X if Hypixel responds with "You cannot say the same message twice!"](#react)
-- [Very customizable](#customizable)
-- [Works on any operating system](#os)
+- Easy-*ish* setup
+- Instant messages back and fourth
+- Reacts with X if Hypixel responds with "You cannot say the same message twice!" or "You can only send a message every 3 seconds!"
+- Very customizable
+- Works on any operating system
 
 ## Install
 
