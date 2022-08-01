@@ -98,7 +98,7 @@ public class MinecraftListener extends SessionAdapter {
             if (authorSub.contains("Officer >")){
                 type = Minecraft.MessageType.OFFICER;
             }
-            if (authorSub.contains("BoreasBot")){
+            if (authorSub.contains(config.getProperties().getProperty("ign"))){
                 return;
             }
             if (!authorSub.contains("Guild >")){

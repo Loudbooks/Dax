@@ -58,6 +58,10 @@ public class Config {
             System.out.println("[ERROR] use-webhook is not set in config.properties");
             System.exit(1);
         }
+        if (this.properties.getProperty("ign") == null) {
+            System.out.println("[ERROR] ign is not set in config.properties");
+            System.exit(1);
+        }
         if (Boolean.parseBoolean(this.properties.getProperty("use-webhook"))) {
             if (this.properties.getProperty("webhook-url") == null) {
                 System.out.println("[ERROR] webhook-url is not set in and use-webhook is true.");
