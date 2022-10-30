@@ -24,11 +24,7 @@ public class Main {
         Constants.getInstance().setMinecraft(minecraft);
 
         Properties prop = Constants.getInstance().getConfig().getProperties();
-        Constants.getInstance().getDiscord().connect(prop.getProperty("discord-token"));
 
-        if (Boolean.parseBoolean(prop.get("use-webhook").toString())){
-            discord.createWebhookClient(prop.getProperty("webhook-url"));
-        }
         String username = prop.getProperty("username");
         String password = prop.getProperty("password");
         String msa_token = prop.getProperty("msa-token");
@@ -37,29 +33,11 @@ public class Main {
         } catch (RequestException e) {
             e.printStackTrace();
             System.out.println("[ERROR] Failed to connect to Minecraft! Is your username, password, and Microsoft token correct?");
+            System.exit(1);
         }
-/*        Scanner input = new Scanner(System.in);
-        String command = input.nextLine();
-        if (command.startsWith("execute")){
-            String commandFormatted = command.toLowerCase().replace("execute", "").trim();
-            if (commandFormatted.contains("/")){
-                minecraft.getClient().send(new ServerboundChatPacket(commandFormatted));
-            } else {
-                minecraft.getClient().send(new ServerboundChatPacket("/" + commandFormatted));
-            }
-            System.out.println("[Dax] Executed command: " + commandFormatted);
-        } else if (command.toLowerCase().startsWith("joinguild")) {
-            String guildName = command.toLowerCase().replace("joinguild", "").trim();
-            minecraft.getClient().send(new ServerboundChatPacket("/guild join " + guildName));
-            System.out.println("[Dax] Sent join command to: " + guildName);
-
-        } else if (command.toLowerCase().startsWith("leaveguild")) {
-            minecraft.getClient().send(new ServerboundChatPacket("/g leave"));
-            Thread.sleep(120);
-            minecraft.getClient().send(new ServerboundChatPacket("/g confirm"));
-            System.out.println("[Dax] Left guild");
-        } else {
-            System.out.println("[ERROR] Unknown command!");
-        }*/
+        Constants.getInstance().getDiscord().connect(prop.getProperty("discord-token"));
+        if (Boolean.parseBoolean(prop.get("use-webhook").toString())){
+            discord.createWebhookClient(prop.getProperty("webhook-url"));
+        }
     }
 }

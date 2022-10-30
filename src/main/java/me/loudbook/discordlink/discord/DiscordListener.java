@@ -10,6 +10,9 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class DiscordListener extends ListenerAdapter {
+    /**
+     * @param e Message received event.
+     */
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
         Discord discord = Constants.getInstance().getDiscord();

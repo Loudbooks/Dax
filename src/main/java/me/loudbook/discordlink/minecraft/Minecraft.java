@@ -29,6 +29,13 @@ public class Minecraft {
     public Minecraft(){
     }
 
+
+    /**
+     * @param username The username of the Microsoft account to connect to.
+     * @param password The password of the Microsoft account to connect to.
+     * @param msaToken The Microsoft token created.
+     * @throws RequestException Exception thrown if the account is invalid.
+     */
     public void connect(String username, String password, String msaToken) throws RequestException {
         this.username = username;
         this.password = password;

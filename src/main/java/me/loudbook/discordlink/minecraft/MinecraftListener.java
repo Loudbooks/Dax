@@ -21,6 +21,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class MinecraftListener extends SessionAdapter {
+    /**
+     * @param client Minecraft account client
+     * @param packet Packet received
+     */
     @Override
     public void packetReceived(Session client, Packet packet) {
         Discord discord = Constants.getInstance().getDiscord();
@@ -109,7 +113,7 @@ public class MinecraftListener extends SessionAdapter {
             if (type == Minecraft.MessageType.PUBLIC) {
                 if (Boolean.parseBoolean(config.getProperties().getProperty("use-webhook"))) {
                     try {
-                        discord.sendWebhook(str, authorFormatted, "https://minotar.net/helm/" + authorFormatted, config.getProperties().getProperty("webhook-url"));
+                        discord.sendWebhook(str, authorFormatted, "https://minotar.net/helm/" + authorFormatted);
                     } catch (IOException e) {
                         e.printStackTrace();
                         System.out.println("Failed to send message to webhook. Is your URL valid?");

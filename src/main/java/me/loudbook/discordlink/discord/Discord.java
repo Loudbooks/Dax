@@ -43,6 +43,9 @@ public class Discord {
         this.messageIds = new ArrayList<>();
     }
 
+    /**
+     * @param token The Discord bot token.
+     */
     public void connect(String token){
         try {
             this.jda = JDABuilder.createDefault(token)
@@ -84,6 +87,9 @@ public class Discord {
         getMainChannel().sendMessageEmbeds(eb.build()).queue();
     }
 
+    /**
+     * @param url The webhook URL.
+     */
     public void createWebhookClient(String url){
         WebhookClientBuilder builder = new WebhookClientBuilder(url); // or id, token
         builder.setThreadFactory((job) -> {
@@ -108,7 +114,13 @@ public class Discord {
         return this.jda.getGuildById(config.getProperties().getProperty("discord-server-id"));
     }
 
-    public void sendWebhook(String message, String author, String avatar, String webhookUrl) throws IOException {
+    /**
+     * @param message The message to send.
+     * @param author The author of the message.
+     * @param avatar The avatar of the author.
+     * @throws IOException If the webhook URL is invalid, or various other http errors.
+     */
+    public void sendWebhook(String message, String author, String avatar) throws IOException {
         Discord discord = Constants.getInstance().getDiscord();
         WebhookMessageBuilder builder = new WebhookMessageBuilder();
         builder.setUsername(author);
@@ -117,6 +129,11 @@ public class Discord {
         discord.getWebhookClient().send(builder.build());
     }
 
+    /**
+     * @param message The message to send.
+     * @param author The author of the message.
+     * @param avatar The avatar of the author.
+     */
     public void sendEmbed(String message, String author, String avatar){
         EmbedBuilder eb = new EmbedBuilder();
         if (author.contains("left")){
@@ -133,6 +150,10 @@ public class Discord {
         channel.sendMessageEmbeds(eb.build()).queue();
     }
 
+    /**
+     * @param message The message to send.
+     * @param channel The channel to send the message to.
+     */
     public void sendMessage(String message, TextChannel channel){
         channel.sendMessage(message).queue();
     }
