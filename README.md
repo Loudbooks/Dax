@@ -22,4 +22,4 @@ Please visit the [wiki](https://github.com/Loudbooks/Dax/wiki) for setup instruc
 
 ## Issues
 
-Feel free to create an issue for any questions/problems you come across. Please always supply a full error stacktrace.
+Feel free to create an issue for any questions/problems you come across. Please always supply a full error stacktrace if necessary.
