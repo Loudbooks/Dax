@@ -46,12 +46,16 @@
       <id>opencollab</id>
       <url>https://repo.opencollab.dev/maven-releases/</url>
     </repository>
+    <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
+    </repository>
   </repositories>
   <dependencies>
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>1.18.24</version>
+      <version>1.18.26</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

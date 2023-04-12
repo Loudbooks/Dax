@@ -57,19 +57,28 @@
             <id>opencollab</id>
             <url>https://repo.opencollab.dev/maven-releases/</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.24</version>
+            <version>1.18.26</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.tycrek</groupId>
+            <artifactId>MCAuthLib</artifactId>
+            <version>3.0</version>
         </dependency>
         <dependency>
             <groupId>com.github.steveice10</groupId>
             <artifactId>mcprotocollib</artifactId>
-            <version>1.18-2</version>
+            <version>1.19.2-1</version>
         </dependency>
         <dependency>
             <groupId>net.dv8tion</groupId>

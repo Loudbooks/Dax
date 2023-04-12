@@ -34,14 +34,6 @@ public class Config {
             System.out.println("[ERROR] discord-token is not set in config.properties");
             System.exit(1);
         }
-        if (this.properties.getProperty("username") == null) {
-            System.out.println("[ERROR] username is not set in config.properties");
-            System.exit(1);
-        }
-        if (this.properties.getProperty("password") == null) {
-            System.out.println("[ERROR] password is not set in config.properties");
-            System.exit(1);
-        }
         if (this.properties.getProperty("msa-token") == null) {
             System.out.println("[ERROR] msa-token is not set in config.properties");
             System.exit(1);
@@ -56,10 +48,6 @@ public class Config {
         }
         if (this.properties.getProperty("use-webhook") == null) {
             System.out.println("[ERROR] use-webhook is not set in config.properties");
-            System.exit(1);
-        }
-        if (this.properties.getProperty("ign") == null) {
-            System.out.println("[ERROR] ign is not set in config.properties");
             System.exit(1);
         }
         if (Boolean.parseBoolean(this.properties.getProperty("use-webhook"))) {

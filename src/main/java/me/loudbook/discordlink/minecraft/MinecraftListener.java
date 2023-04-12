@@ -1,8 +1,9 @@
 package me.loudbook.discordlink.minecraft;
 
 import com.github.steveice10.mc.auth.exception.request.RequestException;
-import com.github.steveice10.mc.protocol.packet.ingame.clientbound.ClientboundChatPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.ClientboundChatPreviewPacket;
 import com.github.steveice10.mc.protocol.packet.ingame.clientbound.ClientboundLoginPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.ClientboundSystemChatPacket;
 import com.github.steveice10.mc.protocol.packet.ingame.serverbound.ServerboundChatPacket;
 import com.github.steveice10.packetlib.Session;
 import com.github.steveice10.packetlib.event.session.DisconnectedEvent;
@@ -18,6 +19,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 
 public class MinecraftListener extends SessionAdapter {
@@ -30,11 +32,16 @@ public class MinecraftListener extends SessionAdapter {
         Discord discord = Constants.getInstance().getDiscord();
         Config config = Constants.getInstance().getConfig();
         if (packet instanceof ClientboundLoginPacket) {
+            //Send to limbo
             for (int i = 0; i < 16; i++) {
-                client.send(new ServerboundChatPacket("/"));
+                client.send(new ServerboundChatPacket("/", Instant.now().toEpochMilli(), 0, new byte[0], false, new ArrayList<>(), null));
             }
-        } else if (packet instanceof ClientboundChatPacket) {
-            Component message = ((ClientboundChatPacket) packet).getMessage().asComponent();
+        } else if (packet instanceof ClientboundSystemChatPacket) {
+            if (!Constants.getInstance().getDiscord().isConnected()) {
+                return;
+            }
+
+            Component message = ((ClientboundSystemChatPacket) packet).getContent().asComponent();
             TextChannel textChannel = discord.getMainChannel();
             assert textChannel != null;
             String gson = GsonComponentSerializer.gson().serialize(message);
@@ -102,7 +109,7 @@ public class MinecraftListener extends SessionAdapter {
             if (authorSub.contains("Officer >")){
                 type = Minecraft.MessageType.OFFICER;
             }
-            if (authorSub.contains(config.getProperties().getProperty("ign"))){
+            if (authorSub.contains(Constants.getInstance().getMinecraft().getUsername())){
                 return;
             }
             if (!authorSub.contains("Guild >")){
@@ -134,9 +141,11 @@ public class MinecraftListener extends SessionAdapter {
             event.getCause().printStackTrace();
         }
         try {
-            Constants.getInstance().getMinecraft().connect(Constants.getInstance().getMinecraft().getUsername(), Constants.getInstance().getMinecraft().getPassword(), Constants.getInstance().getMinecraft().getMsaToken());
-        } catch (RequestException e) {
+            Constants.getInstance().getMinecraft().connect(Constants.getInstance().getMinecraft().getClientID());
+        } catch (RequestException | IOException e) {
             e.printStackTrace();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 }

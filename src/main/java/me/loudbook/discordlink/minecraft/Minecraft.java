@@ -1,64 +1,73 @@
 package me.loudbook.discordlink.minecraft;
 
 import com.github.steveice10.mc.auth.exception.request.RequestException;
-import com.github.steveice10.mc.auth.service.AuthenticationService;
 import com.github.steveice10.mc.auth.service.MsaAuthenticationService;
 import com.github.steveice10.mc.auth.service.SessionService;
+import com.github.steveice10.mc.auth.util.MSALApplicationOptions;
 import com.github.steveice10.mc.protocol.MinecraftConstants;
 import com.github.steveice10.mc.protocol.MinecraftProtocol;
+import com.github.steveice10.mc.protocol.data.game.entity.player.Hand;
+import com.github.steveice10.mc.protocol.data.game.entity.player.InteractAction;
 import com.github.steveice10.mc.protocol.packet.ingame.serverbound.ServerboundChatPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.serverbound.player.ServerboundInteractPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.serverbound.player.ServerboundMovePlayerPosPacket;
 import com.github.steveice10.packetlib.Session;
 import com.github.steveice10.packetlib.tcp.TcpClientSession;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.IOException;
 import java.net.Proxy;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.function.Consumer;
 
+@Getter
 public class Minecraft {
-    @Getter
     private Session client;
+    public String username;
     @Setter
-    @Getter
-    private String username;
+    private String clientID;
     @Setter
-    @Getter
-    private String password;
+    private MsaAuthenticationService auth;
     @Setter
-    @Getter
-    private String msaToken;
-    public Minecraft(){
-    }
-
+    private Consumer<String> deviceCodeConsumer = System.out::println;
 
     /**
-     * @param username The username of the Microsoft account to connect to.
-     * @param password The password of the Microsoft account to connect to.
      * @param msaToken The Microsoft token created.
      * @throws RequestException Exception thrown if the account is invalid.
      */
-    public void connect(String username, String password, String msaToken) throws RequestException {
-        this.username = username;
-        this.password = password;
-        this.msaToken = msaToken;
+    public void connect(String msaToken) throws RequestException, IOException, InterruptedException {
+        this.clientID = msaToken;
+
         String HOST = "hypixel.net";
         int PORT = 25565;
-        Proxy AUTH_PROXY = Proxy.NO_PROXY;
-        AuthenticationService authService = new MsaAuthenticationService(msaToken);
-        authService.setUsername(username);
-        authService.setPassword(password);
-        authService.setProxy(AUTH_PROXY);
-        authService.login();
+
+        Proxy authProxy = Proxy.NO_PROXY;
+        this.auth = new MsaAuthenticationService(clientID, new MSALApplicationOptions.Builder().offlineAccess(true).build());
+        if (!this.auth.isLoggedIn()) {
+
+            this.auth.setDeviceCodeConsumer((deviceCode) -> deviceCodeConsumer.accept(deviceCode.message()));
+
+            this.auth.login();
+
+            System.out.println("Logged in as " +
+                    this.auth.getSelectedProfile().getName() + "(" +
+                    this.auth.getSelectedProfile().getId() + ")");
+        }
+
         MinecraftProtocol protocol;
-        protocol = new MinecraftProtocol(authService.getSelectedProfile(), authService.getAccessToken());
+        protocol = new MinecraftProtocol(auth.getSelectedProfile(), auth.getAccessToken());
         SessionService sessionService = new SessionService();
-        sessionService.setProxy(AUTH_PROXY);
+        sessionService.setProxy(authProxy);
+
+        this.username = auth.getSelectedProfile().getName();
+
         this.client = new TcpClientSession(HOST, PORT, protocol, null);
         this.client.setFlag(MinecraftConstants.SESSION_SERVICE_KEY, sessionService);
         this.client.connect();
-        //Send to limbo
-        for (int i = 0; i < 16; i++) {
-            this.client.send(new ServerboundChatPacket("/"));
-        }
+
         //Add listener
         this.client.addListener(new MinecraftListener());
         System.out.println("[Dax] Connected to Minecraft!");

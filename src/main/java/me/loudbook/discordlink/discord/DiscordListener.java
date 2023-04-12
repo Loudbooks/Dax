@@ -9,6 +9,9 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import java.time.Instant;
+import java.util.ArrayList;
+
 public class DiscordListener extends ListenerAdapter {
     /**
      * @param e Message received event.
@@ -31,10 +34,12 @@ public class DiscordListener extends ListenerAdapter {
             if (client == null) return;
             if (!(message.chars().count() > 255)) {
                 if (e.getTextChannel().getId().equals(discord.getMainChannel().getId())) {
-                    client.send(new ServerboundChatPacket("/gc " + author + ": " + message));
+                    client.send(new ServerboundChatPacket("/gc " + author + ": " + message, Instant.now().toEpochMilli(), 0, new byte[0], false, new ArrayList<>(), null));
+                    discord.getMessageIds().clear();
                     discord.getMessageIds().add(e.getMessage().getId());
                 } else if (e.getTextChannel().getId().equals(discord.getOfficerChannel().getId())){
-                    client.send(new ServerboundChatPacket("/go " + author + ": " + message));
+                    client.send(new ServerboundChatPacket("/go " + author + ": " + message, Instant.now().toEpochMilli(), 0, new byte[0], false, new ArrayList<>(), null));
+                    discord.getMessageIds().clear();
                     discord.getMessageIds().add(e.getMessage().getId());
                 }
             } else {

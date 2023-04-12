@@ -37,6 +37,8 @@ public class Discord {
     private final ArrayList<String> messageIds;
     @Getter
     private WebhookClient webhookClient;
+    @Getter
+    private boolean connected = false;
 
     private Config config;
     public Discord(){
@@ -56,6 +58,7 @@ public class Discord {
                     .setStatus(OnlineStatus.DO_NOT_DISTURB)
                     .build();
             jda.awaitReady();
+            connected = true;
             System.out.println("[Dax] Connected to Discord!");
         } catch (LoginException | InterruptedException e) {
             e.printStackTrace();
@@ -143,7 +146,7 @@ public class Discord {
         } else {
             eb.setColor(Color.getColor("#" + this.config.getProperties().getProperty("embed-color")));
         }
-        eb.setFooter("Dax", "https://lh3.googleusercontent.com/-msDr4kjOaL3VvyCgOg5DlRchCCrtjDNY_WfCWq60QG9vqDCJH5FDqiAcPTQ666pFrlcT-D-96B5f6t9baj3s-fIjfvLifC3y94wb3IPEMDOU1vM_N-ALUe2WrXc7-5-8-Ipz-9EOkDGOuDyFTtjNSChTPEF0HW_8ljPcaKBcl44SucJACm_McU6qWa2xVxupc4C5pORdO3c2EVxqwc1EWlDJqrFZYwsvsUeO8gxMkRTR6_0HMNbIe_MIGxLcEDR4YpleW9nmfAUP4ETPfEO5YhDMoDe7lJSUO_h3vepFE5mW2Jqn_4B078_DFFRMtXKd2urbLVXGJTaGcNduhe-GFJ7gTJGWzmBrK93XShxeCsaKVGAqiRrWeT3IVRwDGnd0Mf0v6sYgr28xShsaLRTE4cPoPsB_1yoKpsz2SdeZY4xw5CymZ0v8CAmVJpr8EwBjSTkWixdzwkl1JiJygY7bAAw7umZNghcs-lP894yahRLaa51ARimM3TXhq6EJU5cIQYQff2_ZFE4rvlUjT8tdB8VMltNU6foSsuv3ENt4FF6WY84-pbZtFYnnivmNj14GAkInTvhYNfZiQ0wChkapy_XHDvq8a87h-h_hDSTbM4QQsUdF8P5qbMvyBJYNX7vS0x_FWpo5c6T61A8X2wIJNFeZzW1CJQV3GaQEW8fvQP1M-1Joxhw6mX0rGI6_q93yRlyIPu6Loc22Egr1cg71WLnj2AxP8Ko5U3G2XL32EKx1z9ZGAmr4I9KSS0nvOnBX-ynW-zZUBzh9-ZiownSouw_yoRgLw4iNnVhRsG-r2KgSAh4n2yoye58u-R_xtJe9zgAGkKZ15M3-417loN7r70lq9WY2W8FuNepWQiJ=w287-h218-no?authuser=1.png");
+        eb.setFooter("Dax Guild Bridge");
         eb.setDescription(message);
         eb.setAuthor(author, "https://plancke.io/hypixel/player/stats/" + avatar, "https://minotar.net/helm/" + avatar);
         TextChannel channel = getMainChannel();
