@@ -43,7 +43,7 @@ group = "org.example"
 version = "1.0-SNAPSHOT"
 description = "Dax"
 
-java.sourceCompatibility = JavaVersion.VERSION_20
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
@@ -51,6 +51,7 @@ tasks.withType<JavaCompile> {
 
 tasks {
     shadowJar {
+        minimize()
         archiveFileName.set("Dax.jar")
     }
 }
