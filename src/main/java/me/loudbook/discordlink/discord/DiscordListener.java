@@ -24,6 +24,7 @@ public class DiscordListener extends ListenerAdapter {
             String message = e.getMessage().getContentDisplay();
             Member member = discord.getGuild().getMember(e.getAuthor());
             String author;
+
             if (member != null && member.getNickname() != null) {
                 author = member.getNickname();
             } else {
@@ -31,16 +32,18 @@ public class DiscordListener extends ListenerAdapter {
             }
             Minecraft minecraft = Constants.getInstance().getMinecraft();
             Session client = minecraft.getClient();
+
             if (client == null) return;
+
             if (!(message.chars().count() > 255)) {
-                if (e.getTextChannel().getId().equals(discord.getMainChannel().getId())) {
+                if (e.getTextChannel().equals(discord.getMainChannel())) {
                     client.send(new ServerboundChatPacket("/gc " + author + ": " + message, Instant.now().toEpochMilli(), 0, new byte[0], false, new ArrayList<>(), null));
-                    discord.getMessageIds().clear();
-                    discord.getMessageIds().add(e.getMessage().getId());
-                } else if (e.getTextChannel().getId().equals(discord.getOfficerChannel().getId())){
+                    discord.setLatestPublicMessage(e.getMessage());
+                    discord.setLatestMessageType(Minecraft.MessageType.PUBLIC);
+                } else if (e.getTextChannel().equals(discord.getOfficerChannel())){
                     client.send(new ServerboundChatPacket("/go " + author + ": " + message, Instant.now().toEpochMilli(), 0, new byte[0], false, new ArrayList<>(), null));
-                    discord.getMessageIds().clear();
-                    discord.getMessageIds().add(e.getMessage().getId());
+                    discord.setLatestOfficerMessage(e.getMessage());
+                    discord.setLatestMessageType(Minecraft.MessageType.OFFICER);
                 }
             } else {
                 e.getMessage().reply("Message is too long, canceling send.").queue();

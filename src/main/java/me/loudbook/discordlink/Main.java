@@ -35,7 +35,8 @@ public class Main {
 
         Constants.getInstance().getDiscord().connect(prop.getProperty("discord-token"));
         if (Boolean.parseBoolean(prop.get("use-webhook").toString())){
-            discord.createWebhookClient(prop.getProperty("webhook-url"));
+            discord.createWebhookClient(prop.getProperty("guild-webhook-url"), Minecraft.MessageType.PUBLIC);
+            discord.createWebhookClient(prop.getProperty("officer-webhook-url"), Minecraft.MessageType.OFFICER);
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {

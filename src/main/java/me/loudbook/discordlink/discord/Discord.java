@@ -4,13 +4,16 @@ import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import lombok.Getter;
+import lombok.Setter;
 import me.loudbook.discordlink.backend.Config;
 import me.loudbook.discordlink.backend.Constants;
+import me.loudbook.discordlink.minecraft.Minecraft;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
@@ -29,22 +32,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
+@Getter
 public class Discord {
-    @Getter
     private JDA jda;
-    @Getter
-    private final ArrayList<String> messageIds;
-    @Getter
-    private WebhookClient webhookClient;
-    @Getter
+    @Setter
+    private Message latestPublicMessage;
+    @Setter
+    private Message latestOfficerMessage;
+    @Setter
+    private Minecraft.MessageType latestMessageType;
+    private WebhookClient guildWebhookClient;
+    private WebhookClient officerWebhookClient;
     private boolean connected = false;
 
     private Config config;
-    public Discord(){
-        this.messageIds = new ArrayList<>();
-    }
-
     /**
      * @param token The Discord bot token.
      */
@@ -93,16 +94,20 @@ public class Discord {
     /**
      * @param url The webhook URL.
      */
-    public void createWebhookClient(String url){
+    public void createWebhookClient(String url, Minecraft.MessageType type){
         WebhookClientBuilder builder = new WebhookClientBuilder(url); // or id, token
         builder.setThreadFactory((job) -> {
             Thread thread = new Thread(job);
-            thread.setName("main");
+            thread.setName(type.name());
             thread.setDaemon(true);
             return thread;
         });
         builder.setWait(true);
-        this.webhookClient = builder.build();
+        if (type == Minecraft.MessageType.PUBLIC) {
+            this.guildWebhookClient = builder.build();
+        } else {
+            this.officerWebhookClient = builder.build();
+        }
     }
 
     public TextChannel getMainChannel(){
@@ -123,13 +128,15 @@ public class Discord {
      * @param avatar The avatar of the author.
      * @throws IOException If the webhook URL is invalid, or various other http errors.
      */
-    public void sendWebhook(String message, String author, String avatar) throws IOException {
-        Discord discord = Constants.getInstance().getDiscord();
+    public void sendWebhook(String message, String author, String avatar, Minecraft.MessageType type) throws IOException {
         WebhookMessageBuilder builder = new WebhookMessageBuilder();
         builder.setUsername(author);
         builder.setAvatarUrl(avatar);
         builder.setContent(message);
-        discord.getWebhookClient().send(builder.build());
+        switch (type) {
+            case PUBLIC -> this.getGuildWebhookClient().send(builder.build());
+            case OFFICER -> this.getOfficerWebhookClient().send(builder.build());
+        }
     }
 
     /**
@@ -137,7 +144,7 @@ public class Discord {
      * @param author The author of the message.
      * @param avatar The avatar of the author.
      */
-    public void sendEmbed(String message, String author, String avatar){
+    public void sendEmbed(String message, String author, String avatar, Minecraft.MessageType type){
         EmbedBuilder eb = new EmbedBuilder();
         if (author.contains("left")){
             eb.setColor(0xFF0000);
@@ -146,10 +153,13 @@ public class Discord {
         } else {
             eb.setColor(Color.getColor("#" + this.config.getProperties().getProperty("embed-color")));
         }
-        eb.setFooter("Dax Guild Bridge");
+        eb.setFooter("Dax");
         eb.setDescription(message);
         eb.setAuthor(author, "https://plancke.io/hypixel/player/stats/" + avatar, "https://minotar.net/helm/" + avatar);
         TextChannel channel = getMainChannel();
+
+        if (type == Minecraft.MessageType.OFFICER) channel = getOfficerChannel();
+
         channel.sendMessageEmbeds(eb.build()).queue();
     }
 

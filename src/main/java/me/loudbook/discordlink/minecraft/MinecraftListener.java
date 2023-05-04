@@ -14,13 +14,19 @@ import com.google.gson.JsonParser;
 import me.loudbook.discordlink.backend.Config;
 import me.loudbook.discordlink.backend.Constants;
 import me.loudbook.discordlink.discord.Discord;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.exceptions.ContextException;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
+import javax.lang.model.element.ElementVisitor;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 public class MinecraftListener extends SessionAdapter {
     /**
@@ -46,21 +52,24 @@ public class MinecraftListener extends SessionAdapter {
             assert textChannel != null;
             String gson = GsonComponentSerializer.gson().serialize(message);
             JsonObject jsonObject = (JsonObject) new JsonParser().parse(gson);
-            ArrayList<String> messagesID = discord.getMessageIds();
             if (jsonObject.get("text").getAsString().equals("You cannot say the same message twice!") || jsonObject.get("text").getAsString().contains("You can only chat every")) {
-                try {
-                    textChannel.retrieveMessageById(messagesID.get(0)).queue((messageFail) -> messageFail.addReaction("❌").queue());
-                    messagesID.remove(0);
-                } catch (NullPointerException e) {
-                    TextChannel officerChannel = discord.getOfficerChannel();
-                    officerChannel.retrieveMessageById(messagesID.get(0)).queue((messageFail) -> messageFail.addReaction("❌").queue());
-                    messagesID.remove(0);
+                if (discord.getLatestMessageType() == Minecraft.MessageType.PUBLIC) {
+                    discord.getLatestPublicMessage().addReaction("❌").queue(null, new ErrorHandler()
+                            .handle(ErrorResponse.UNKNOWN_MESSAGE, (e) ->
+                                    discord.getMainChannel().sendMessage("I couldn't find the message to react to!").queue()));
+                } else {
+                    discord.getLatestOfficerMessage().addReaction("❌").queue(null, new ErrorHandler()
+                            .handle(ErrorResponse.UNKNOWN_MESSAGE, (e) ->
+                                    discord.getOfficerChannel().sendMessage("I couldn't find the message to react to!").queue()));
                 }
+                return;
             }
+
             String str = null;
             String author = null;
             String authorSub = null;
             String authorFormatted = null;
+
             try {
                 str = jsonObject.getAsJsonArray("extra").get(1).getAsJsonObject().get("text").getAsString().replace("*", "\\*");
                 authorSub = jsonObject.getAsJsonArray("extra").get(0).getAsJsonObject().get("text").getAsString();
@@ -68,7 +77,9 @@ public class MinecraftListener extends SessionAdapter {
             } catch (Exception ignored) {
                 //This means it's a chat message we don't care about!
             }
-            if (str == null)return;
+
+            if (str == null) return;
+
             if (author != null) {
                 authorFormatted = author
                         .replace("§3", "")
@@ -89,16 +100,19 @@ public class MinecraftListener extends SessionAdapter {
                         .replace("§c", "")
                         .replace("§d", "")
                         .replace("§e", "")
-                        .replace("§f", "").trim();
+                        .replace("§f", "")
+                        .replace(">", "")
+                        .replace("<", "").trim();
             }
+
             String authorjoinLeave = jsonObject.getAsJsonArray("extra").get(0).getAsJsonObject().get("text").getAsString().trim();
             if (str.contains("joined.")){
                 String joinMessage = authorjoinLeave + " joined!";
-                discord.sendEmbed("", joinMessage, authorjoinLeave);
+                discord.sendEmbed("", joinMessage, authorjoinLeave, Minecraft.MessageType.PUBLIC);
                 return;
             } else if (str.contains("left.")) {
                 String leftMessage = authorjoinLeave + " left!";
-                discord.sendEmbed("", leftMessage, authorjoinLeave);
+                discord.sendEmbed("", leftMessage, authorjoinLeave, Minecraft.MessageType.PUBLIC);
                 return;
             }
             if (authorFormatted == null) return;
@@ -117,22 +131,33 @@ public class MinecraftListener extends SessionAdapter {
                     return;
                 }
             }
-            if (type == Minecraft.MessageType.PUBLIC) {
-                if (Boolean.parseBoolean(config.getProperties().getProperty("use-webhook"))) {
-                    try {
-                        discord.sendWebhook(str, authorFormatted, "https://minotar.net/helm/" + authorFormatted);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        System.out.println("Failed to send message to webhook. Is your URL valid?");
+            switch (type) {
+                case PUBLIC -> {
+                    if (Boolean.parseBoolean(config.getProperties().getProperty("use-webhook"))) {
+                        try {
+                            discord.sendWebhook(str, authorFormatted, "https://minotar.net/helm/" + authorLink, Minecraft.MessageType.PUBLIC);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            System.out.println("Failed to send message to webhook. Is your URL valid?");
+                        }
+                    } else {
+                        discord.sendEmbed(str, authorFormatted, authorLink, Minecraft.MessageType.PUBLIC);
                     }
-                } else {
-                    discord.sendEmbed(str, authorFormatted, authorLink);
                 }
-            } else {
-                discord.sendMessage("**" + authorFormatted.replace(">", "").trim() + "**: " + str, discord.getOfficerChannel());
+                case OFFICER -> {
+                    if (Boolean.parseBoolean(config.getProperties().getProperty("use-webhook"))) {
+                        try {
+                            discord.sendWebhook(str, authorFormatted, "https://minotar.net/helm/" + authorLink, Minecraft.MessageType.OFFICER);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            System.out.println("Failed to send message to webhook. Is your URL valid?");
+                        }
+                    } else {
+                        discord.sendEmbed(str, authorFormatted, authorLink, Minecraft.MessageType.OFFICER);
+                    }
+                }
             }
         }
-
     }
     @Override
     public void disconnected(DisconnectedEvent event) {
